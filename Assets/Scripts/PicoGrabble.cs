@@ -7,66 +7,74 @@ using UnityEngine;
 
 public class PicoGrabble : MonoBehaviour
 {
-    [SerializeField] private Pvr_Controller PicoController;
-    private float distanceToLeftHand;
-    private float distanceToRightHand;
-    private float grabDistance = 2;
-    [HideInInspector]public bool inHand;
-    private float distance;
-    [HideInInspector]public GameObject firstController;
-    [HideInInspector]public GameObject secondController;
-    private int closestController = 2;
+    [SerializeField] public Pvr_Controller PicoController;
+    public bool inLeftHand = false;
+    public bool inRightHand = false;
+    public Grabble grabbleInLeftHand;
+    public Grabble grabbleInRightHand;
+    public GameObject other;
 
     private void Start()
     {
+        if (PicoController == null)
+            PicoController = GetComponent<Pvr_Controller>();
         if (PicoController == null)
             PicoController = GameObject.FindObjectOfType<Pvr_Controller>();
     }
 
     private void Update()
     {
-        UnGrabbedUpdate();
-    }
-
-    private void UnGrabbedUpdate()
-    {
-        
-        distanceToLeftHand = 1000f;
-        distanceToRightHand = 1000f;
-        
-        distanceToLeftHand = (transform.position - PicoController.controller0.transform.position).magnitude;
-        distanceToRightHand = (transform.position - PicoController.controller1.transform.position).magnitude;
-
-        if (grabDistance > distanceToRightHand || grabDistance > distanceToLeftHand)
+        if (inLeftHand)
         {
-            closestController = 2;
-            
-            distance = Mathf.Min(distanceToLeftHand, distanceToRightHand);
+            grabbleInLeftHand.Grab(PicoController.controller0);
+            if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.TRIGGER) || Input.GetKeyDown(KeyCode.Q))
+            {
+                Debug.Log("leftOff");
+                grabbleInLeftHand.grabbed = false;
+                grabbleInLeftHand.rb.isKinematic = false;
+                grabbleInLeftHand = null;
+                inLeftHand = false;
+            }
+        }
 
-            if (distanceToLeftHand < distanceToRightHand)
+        if (inRightHand)
+        {
+            grabbleInRightHand.Grab(PicoController.controller1);
+            if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.TRIGGER) || Input.GetKeyDown(KeyCode.E))
             {
-                closestController = 0;
-                firstController = PicoController.controller0;
-                secondController = PicoController.controller1;
-            }
-            
-            if(distanceToRightHand < distanceToLeftHand)
-            {
-                closestController = 1;
-                firstController = PicoController.controller1;
-                secondController = PicoController.controller0;
-            }
-
-            if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(closestController, Pvr_KeyCode.TRIGGER))
-            {
-                inHand = true;
-            }
-            if(Input.GetKeyDown(KeyCode.E))
-            {
-                inHand = true;
+                Debug.Log("rightOff");
+                grabbleInRightHand.grabbed = false;
+                grabbleInRightHand.rb.isKinematic = false;
+                grabbleInRightHand = null;
+                inRightHand = false;
             }
         }
         
+        if (other)
+        {
+            if (!other.GetComponent<Grabble>().grabbed)
+                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.TRIGGER) || Input.GetKeyDown(KeyCode.Q))
+                {
+                    Debug.Log("GrabLeft");
+                    grabbleInLeftHand = other.GetComponent<Grabble>();
+                    grabbleInLeftHand.rb.isKinematic = true;
+                    grabbleInLeftHand.grabbed = true;
+                    inLeftHand = true;
+                }
+            
+            if (!other.GetComponent<Grabble>().grabbed)
+                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.TRIGGER) || Input.GetKeyDown(KeyCode.E))
+                {
+                    Debug.Log("GrabRight");
+                    grabbleInRightHand = other.GetComponent<Grabble>();
+                    grabbleInRightHand.rb.isKinematic = true;
+                    grabbleInRightHand.Grab(PicoController.controller1);
+                    grabbleInRightHand.grabbed = true;
+                    inRightHand = true;
+                }
+        }
+        
+        
+      
     }
-    
 }
