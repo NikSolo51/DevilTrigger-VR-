@@ -13,9 +13,5 @@ public class ControllerTrigger : MonoBehaviour
         {
             _picoGrabble.other = other.gameObject;
         }
-        else
-        {
-            _picoGrabble.other = null;
-        }
     }
 }

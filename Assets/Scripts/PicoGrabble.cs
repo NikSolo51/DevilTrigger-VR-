@@ -24,6 +24,7 @@ public class PicoGrabble : MonoBehaviour
 
     private void Update()
     {
+        
         if (inLeftHand)
         {
             grabbleInLeftHand.Grab(PicoController.controller0);
@@ -34,6 +35,7 @@ public class PicoGrabble : MonoBehaviour
                 grabbleInLeftHand.rb.isKinematic = false;
                 grabbleInLeftHand = null;
                 inLeftHand = false;
+                return;
             }
         }
 
@@ -47,6 +49,7 @@ public class PicoGrabble : MonoBehaviour
                 grabbleInRightHand.rb.isKinematic = false;
                 grabbleInRightHand = null;
                 inRightHand = false;
+                return;
             }
         }
         
@@ -77,4 +80,6 @@ public class PicoGrabble : MonoBehaviour
         
       
     }
+
+   
 }
