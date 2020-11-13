@@ -22,6 +22,8 @@ public class Grabble : MonoBehaviour
 
     public void Grab(GameObject controller)
     {
-        transform.SetPositionAndRotation(controller.transform.position, controller.transform.rotation);
+        transform.position = Vector3.Lerp(transform.position,controller.transform.position,0.1f);
+        transform.rotation = Quaternion.Slerp(transform.rotation, controller.transform.rotation, 1f);
+        //transform.SetPositionAndRotation(controller.transform.position, controller.transform.rotation);
     }
 }
