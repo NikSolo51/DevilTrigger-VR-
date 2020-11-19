@@ -13,8 +13,6 @@ using System;
 public class Pvr_Controller : MonoBehaviour
 {
     public static Pvr_Controller Instance;
-    
-
     /************************************    Properties  *************************************/
     #region Properties
 
@@ -59,11 +57,19 @@ public class Pvr_Controller : MonoBehaviour
     #region Unity API
     void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(this.gameObject);
+        }
+        else
+            Destroy(this.gameObject);
+        
         Pvr_ControllerManager.PvrServiceStartSuccessEvent += ServiceStartSuccess;
         Pvr_ControllerManager.SetControllerAbilityEvent += CheckControllerState;
         Pvr_ControllerManager.ChangeMainControllerCallBackEvent += MainControllerChanged;
         Pvr_ControllerManager.ChangeHandNessCallBackEvent += HandnessChanged;
-
+        
     }
     void Start()
     {

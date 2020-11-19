@@ -11,15 +11,16 @@ public class PicoGrabble : MonoBehaviour
     [SerializeField] public Pvr_Controller PicoController;
     [SerializeField] public GetOtherObjectInTrigger _getOtherObjectLeftController;
     [SerializeField] public GetOtherObjectInTrigger _getOtherObjectRightController;
-    public bool inLeftHand = false;
-    public bool inRightHand = false;
-    public Grabble grabbleInLeftHand;
-    public Grabble grabbleInRightHand;
+    bool inLeftHand = false;
+    bool inRightHand = false;
+    Grabble grabbleInLeftHand;
+    Grabble grabbleInRightHand;
     private GameObject otherLeft;
     private GameObject otherRight;
 
     private void Awake()
     {
+        
         if (Instance == null)
         {
             Instance = this;
@@ -27,6 +28,7 @@ public class PicoGrabble : MonoBehaviour
         }
         else
             Destroy(this.gameObject);
+            
     }
 
     private void Start()
