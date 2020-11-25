@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using Pvr_UnitySDKAPI;
 using UnityEngine;
 
-public class Teleport : MonoBehaviour , IMovement
+public class Teleport : MonoBehaviour //, IMovement
 {
+    /*
         LineRenderer laser;
         int laserSteps = 20;
         float laserSegmentDistance = 1f, dropPerSegment = .1f;
@@ -113,7 +114,8 @@ public class Teleport : MonoBehaviour , IMovement
                 ResetLaser();
             }
         }
-
+        
+        
         private void TryToGetTeleportTarget()
         {
             targetAcquired = false;
@@ -174,7 +176,7 @@ public class Teleport : MonoBehaviour , IMovement
                 laser.SetPosition(i, Vector3.zero);
             }
         }
-    
+    */
 }
 
 

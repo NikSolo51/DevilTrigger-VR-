@@ -11,6 +11,7 @@ public enum MovementType
 
 public class Movement : MonoBehaviour
 {
+    /*
     [SerializeField] MovementType _movementType;
     public static Movement Instance;
     [Header("TeleportSetting")] public LineRenderer laserLeftController;
@@ -55,4 +56,5 @@ public class Movement : MonoBehaviour
         leftController.Tick();
         rightController.Tick();
     }
+    */
 }

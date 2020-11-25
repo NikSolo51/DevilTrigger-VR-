@@ -44,7 +44,7 @@ public class SimpleShoot : MonoBehaviour
 
     void Update()
     {
-        if(!_Grabble.grabbed)
+        if(!(_Grabble.InLeftHand || _Grabble.InRightHand))
             return;
         
         //If you want a different input, change it here

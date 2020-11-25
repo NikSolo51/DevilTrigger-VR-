@@ -3,28 +3,67 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Grabble : MonoBehaviour 
+[RequireComponent(typeof(Rigidbody))]
+public class Grabble : MonoBehaviour
 {
-    public bool grabbed;
-    [HideInInspector]public Rigidbody rb;
+    [SerializeField] bool interactable = true;
+    
+    [HideInInspector] Rigidbody rb;
+
+    [SerializeField]bool grabbed = false;
+    [SerializeField]bool inLeftHand = false;
+    [SerializeField]bool inRightHand = false;
+    
+    public bool Grabbed
+    {
+        get => grabbed;
+        set => grabbed = value;
+    }
+
+    public Rigidbody Rb
+    {
+        get => rb;
+        set => rb = value;
+    }
+
+    public bool InLeftHand
+    {
+        get => inLeftHand;
+        set => inLeftHand = value;
+    }
+
+    public bool InRightHand
+    {
+        get => inRightHand;
+        set => inRightHand = value;
+    }
+    
+    public bool Interactable
+    {
+        get => interactable;
+        set => interactable = value;
+    }
+
 
     private void Start()
     {
-        if(GetComponent<Rigidbody>())
-        rb = GetComponent<Rigidbody>();
-        else if(rb == null)
-        {
-            this.gameObject.AddComponent<Rigidbody>();
+        if (GetComponent<Rigidbody>())
             rb = GetComponent<Rigidbody>();
-            Debug.Log("You need add RigidBody to " + gameObject.name);
-        }
     }
-
-    public void Grab(GameObject grabber,float percentPosition, float percentRotation)
+    
+    public void ResetState()
+    {
+        rb.isKinematic = false;
+        grabbed = false;
+        inLeftHand = false;
+        inRightHand = false;
+    }
+    
+    public void Grab(GameObject grabber, float percentPosition, float percentRotation)
     {
         rb.isKinematic = true;
-        transform.position = Vector3.Lerp(transform.position,grabber.transform.position,percentPosition);
+        grabbed = true;
+        transform.position = Vector3.Lerp(transform.position, grabber.transform.position, percentPosition);
         transform.rotation = Quaternion.Slerp(transform.rotation, grabber.transform.rotation, percentRotation);
-        //transform.SetPositionAndRotation(controller.transform.position, controller.transform.rotation);
     }
 }
