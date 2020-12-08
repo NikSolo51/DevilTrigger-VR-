@@ -13,7 +13,8 @@ public class Grabble : MonoBehaviour
     [SerializeField]bool grabbed = false;
     [SerializeField]bool inLeftHand = false;
     [SerializeField]bool inRightHand = false;
-    
+    [SerializeField]Vector3 axis;
+    [SerializeField]float offsetRotation;
     public bool Grabbed
     {
         get => grabbed;
@@ -61,9 +62,10 @@ public class Grabble : MonoBehaviour
     
     public void Grab(GameObject grabber, float percentPosition, float percentRotation)
     {
-        rb.isKinematic = true;
+        rb.isKinematic = true; 
         grabbed = true;
         transform.position = Vector3.Lerp(transform.position, grabber.transform.position, percentPosition);
         transform.rotation = Quaternion.Slerp(transform.rotation, grabber.transform.rotation, percentRotation);
+        transform.Rotate(axis,offsetRotation);
     }
 }

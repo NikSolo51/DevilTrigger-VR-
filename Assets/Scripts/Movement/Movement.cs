@@ -12,7 +12,7 @@ public enum MovementType
 public class Movement : MonoBehaviour
 {
     /*
-    [SerializeField] MovementType _movementType;
+    [SerializeField] MovementType movementType;
     public static Movement Instance;
     [Header("TeleportSetting")] public LineRenderer laserLeftController;
     public LineRenderer laserRightController;
@@ -36,7 +36,7 @@ public class Movement : MonoBehaviour
 
     private void Start()
     {
-        if (_movementType == MovementType.Teleport)
+        if (movementType == MovementType.Teleport)
         {
             leftController = new Teleport();
             leftController.Initialize(0);

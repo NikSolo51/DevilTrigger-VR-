@@ -7,7 +7,7 @@ using UnityEngine;
 public class PicoGrabbleManager : MonoBehaviour
 {
     public static PicoGrabbleManager Instance;
-    [SerializeField] GameObject _controller0, _controller1;
+    public GameObject _controller0, _controller1;
     [HideInInspector] public PicoGrabble leftHand;
     [HideInInspector] public PicoGrabble rightHand;
     

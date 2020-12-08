@@ -6,102 +6,117 @@ using UnityEngine;
 
 public class PicoSocketInteractor : MonoBehaviour
 {
-    [SerializeField]private bool emptySocket = true;
-    [SerializeField]GameObject _otherObj;
-    Grabble _grabble;
-    
+    [SerializeField] private bool emptySocket = true;
+    [SerializeField] private bool block = false;
+    [SerializeField] GameObject otherObj;
+    [SerializeField] private LayerMask layerMask = 0;
+    [SerializeField] Grabble grabble;
+
+    public bool Block
+    {
+        get => block;
+        set => block = value;
+    }
+
     public GameObject OtherObj
     {
-        get => _otherObj;
-        set => _otherObj = value;
+        get { return otherObj; }
+
+        set { otherObj = value; }
     }
-    
+
     private void OnTriggerStay(Collider other)
+    {
+        if (layerMask == (1 << other.gameObject.layer))
         {
             if (other.gameObject.GetComponent<Grabble>())
+            {
                 if (other.gameObject.GetComponent<Grabble>().Interactable)
                 {
-                    if (!emptySocket)
-                        return;
-                    _otherObj = other.gameObject;
-                    emptySocket = false;
+                    otherObj = other.gameObject;
                 }
+            }
         }
-    
-    private void OnTriggerExit(Collider other)
-    {
-        _otherObj = null;
-        emptySocket = true; 
     }
     
-
-    private void Update()
+    private void FixedUpdate()
     {
-        if (_grabble)
+        
+        if (grabble)
         {
-            if ((Input.GetKeyDown(KeyCode.Q) ||
-                 Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.TRIGGER)) )
+            if (otherObj)
             {
-                // _grabble.Grabbed = true;
-                _otherObj = null;
-                _grabble = null;
-                emptySocket = true;
-                return;
-            }
+                if (otherObj == PicoGrabbleManager.Instance._controller0)
+                    if ((Input.GetKeyDown(KeyCode.Q) ||
+                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A)))
+                    {
+                        if (grabble.InLeftHand)
+                        {
+                            ResetState();
+                            return;
+                        }
+                    }
 
-            //if(_otherObj.GetComponent<Grabble>() == PicoGrabbleManager.Instance.rightHand)
-            if ((Input.GetKeyDown(KeyCode.E) ||
-                 Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.TRIGGER)) )
-            {
-                    
-                //_grabble.Grabbed = true;
-                _otherObj = null;
-                _grabble = null;
-                emptySocket = true;
-                return;
-            }
-        }
-
-        if (_otherObj)
-        {
-            if (!emptySocket)
-            {
-                //if(_otherObj.GetComponent<Grabble>() == PicoGrabbleManager.Instance.leftHand)
-                if ((Input.GetKeyDown(KeyCode.Q) ||
-                     Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.TRIGGER)))
-                {
-                    // _grabble.Grabbed = true;
-                    _grabble = _otherObj.GetComponent<Grabble>();
-                    return;
-                }
-
-                //if(_otherObj.GetComponent<Grabble>() == PicoGrabbleManager.Instance.rightHand)
-                if ((Input.GetKeyDown(KeyCode.E) ||
-                     Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.TRIGGER)))
-                {
-                    //_grabble.Grabbed = true;
-                    _grabble = _otherObj.GetComponent<Grabble>();
-                    return;
-                }
+                if (otherObj == PicoGrabbleManager.Instance._controller1)
+                    if ((Input.GetKeyDown(KeyCode.E) ||
+                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A)))
+                    {
+                        if (grabble.InRightHand)
+                        {
+                            ResetState();
+                            return;
+                        }
+                    }
             }
         }
 
-        if (_grabble)
+        if (otherObj)
         {
-            if (_grabble.InLeftHand == false && _grabble.InRightHand == false)
+            if (emptySocket)
+            {
+                
+                if (otherObj.GetComponent<Grabble>().InLeftHand)
+                    if ((Input.GetKeyDown(KeyCode.Q) ||
+                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A)))
+                    {
+                        
+                        grabble = otherObj.GetComponent<Grabble>();
+                        if (block)
+                            grabble.Interactable = false;
+                        emptySocket = false;
+                        return;
+                    }
+
+                if (otherObj.GetComponent<Grabble>().InRightHand)
+                    if ((Input.GetKeyDown(KeyCode.E) ||
+                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A)))
+                    {
+                        grabble = otherObj.GetComponent<Grabble>();
+                        if (block)
+                            grabble.Interactable = false;
+                        emptySocket = false;
+                        return;
+                    }
+            }
+        }
+
+        if (grabble)
+        {
+            if (grabble.InLeftHand == false && grabble.InRightHand == false)
             {
                 if (!emptySocket)
                 {
-                    _grabble.Grab(this.gameObject, 0.7f, 1f);
-                } 
+                   
+                    grabble.Grab(this.gameObject, 1f, 1f);
+                }
             }
         }
     }
 
     public void ResetState()
     {
+        otherObj = null;
+        grabble = null;
         emptySocket = true;
-        _otherObj = null;
-        _grabble = null;
     }
 }
