@@ -7,27 +7,26 @@ using UnityEngine;
 public class PicoSocketInteractor : MonoBehaviour
 {
     [SerializeField] private bool emptySocket = true;
-    [SerializeField] private bool block = false;
     [SerializeField] GameObject otherObj;
     [SerializeField] private LayerMask layerMask = 0;
     [SerializeField] Grabble grabble;
-
-    public bool Block
-    {
-        get => block;
-        set => block = value;
-    }
-
+    private bool triggerEmpty;
+    
     public GameObject OtherObj
     {
-        get { return otherObj; }
+        get
+        {
+            return otherObj;
+        }
 
         set { otherObj = value; }
     }
-
+    
     private void OnTriggerStay(Collider other)
     {
-        if (layerMask == (1 << other.gameObject.layer))
+        triggerEmpty = false;
+        
+        if ((layerMask.value & (1 << other.gameObject.layer)) > 0)
         {
             if (other.gameObject.GetComponent<Grabble>())
             {
@@ -38,83 +37,69 @@ public class PicoSocketInteractor : MonoBehaviour
             }
         }
     }
-    
+
     private void FixedUpdate()
     {
         
-        if (grabble)
+        if (!emptySocket)
         {
-            if (otherObj)
+            if (grabble.InLeftHand || grabble.InRightHand)
             {
-                if (otherObj == PicoGrabbleManager.Instance._controller0)
-                    if ((Input.GetKeyDown(KeyCode.Q) ||
-                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A)))
-                    {
-                        if (grabble.InLeftHand)
-                        {
-                            ResetState();
-                            return;
-                        }
-                    }
-
-                if (otherObj == PicoGrabbleManager.Instance._controller1)
-                    if ((Input.GetKeyDown(KeyCode.E) ||
-                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A)))
-                    {
-                        if (grabble.InRightHand)
-                        {
-                            ResetState();
-                            return;
-                        }
-                    }
+                Debug.Log("IsResetState" + this.gameObject);
+                ResetState();
+                return;
             }
         }
-
+        
         if (otherObj)
-        {
             if (emptySocket)
             {
+                Debug.Log("SocketNotEmpty " + this.gameObject);
+                if(otherObj.GetComponent<Grabble>().InLeftHand)
+                {
+                    Debug.Log("InLeftHand");
+                    if (otherObj.GetComponent<Grabble>().InLeftHand)
+                        if (Input.GetKeyDown(KeyCode.Q) ||
+                             Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A))
+                        {
+                            Debug.Log("IGETOBJECT");
+                            grabble = otherObj.GetComponent<Grabble>();
+                            emptySocket = false;
+                            return;
+                        }
+                }
                 
-                if (otherObj.GetComponent<Grabble>().InLeftHand)
-                    if ((Input.GetKeyDown(KeyCode.Q) ||
-                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A)))
-                    {
-                        
-                        grabble = otherObj.GetComponent<Grabble>();
-                        if (block)
-                            grabble.Interactable = false;
-                        emptySocket = false;
-                        return;
-                    }
 
                 if (otherObj.GetComponent<Grabble>().InRightHand)
-                    if ((Input.GetKeyDown(KeyCode.E) ||
-                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A)))
+                    if (Input.GetKeyDown(KeyCode.E) ||
+                         Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A))
                     {
                         grabble = otherObj.GetComponent<Grabble>();
-                        if (block)
-                            grabble.Interactable = false;
                         emptySocket = false;
                         return;
                     }
             }
-        }
 
         if (grabble)
         {
-            if (grabble.InLeftHand == false && grabble.InRightHand == false)
+            if (!emptySocket)
             {
-                if (!emptySocket)
-                {
-                   
-                    grabble.Grab(this.gameObject, 1f, 1f);
-                }
+                if(!grabble.InLeftHand && !grabble.InRightHand)
+                grabble.Grab(this.gameObject, 1f, 1f);
             }
+        }
+        
+        triggerEmpty = true;
+        if (triggerEmpty)
+        {
+            otherObj = null;
         }
     }
 
     public void ResetState()
     {
+        if(otherObj)
+        otherObj.transform.SetParent(null);
         otherObj = null;
         grabble = null;
         emptySocket = true;

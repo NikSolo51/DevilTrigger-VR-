@@ -55,7 +55,7 @@ public class CylinderScript : MonoBehaviour
         
         for (int i = 0; i < dublicatesOtheObj.Count; i++)
         {
-            dublicatesOtheObj[i].ResetState();    
+           // dublicatesOtheObj[i].ResetState();    
         }
         
 
@@ -89,6 +89,30 @@ public class CylinderScript : MonoBehaviour
             rotatingCyl = false;
             endAngle += 60F;
         }
-        
+    }
+
+    public void OpenCylinder(bool open)
+    {
+        if (open)
+        {
+            for (int i = 0; i < picoSocketsInteractors.Count; i++)
+            {
+                if (picoSocketsInteractors[i].OtherObj)
+                {
+                    picoSocketsInteractors[i].OtherObj.GetComponent<Grabble>().gameObject.layer = 0;
+                }
+                    
+            }
+        }
+        else
+        {
+            for (int i = 0; i < picoSocketsInteractors.Count; i++)
+            {
+                if (picoSocketsInteractors[i].OtherObj)
+                {
+                    picoSocketsInteractors[i].OtherObj.GetComponent<Grabble>().gameObject.layer = 8;
+                }
+            }
+        }
     }
 }

@@ -9,25 +9,27 @@ public class PicoGrabble : MonoBehaviour
     [SerializeField] private bool empty = true;
     [SerializeField] GameObject otherObj;
     private Grabble grabble;
+    [SerializeField]private GetOtherObjectTrigger getOtherObjectTrigger;
 
-    [Header("GetOtherObjectUseControllerA")] [SerializeField]
-    private GetOtherObjectTrigger getOtherObjectSelfController;
-
-    [Header("GetOtherObjectUseLowDistanceA")] [SerializeField]
-    private GetOtherObjectTrigger getOtherObjectLowDistance;
+    private void Start()
+    {
+        if(!getOtherObjectTrigger)
+        getOtherObjectTrigger = GetComponent<GetOtherObjectTrigger>();
+    }
 
     public Grabble Grabble => grabble;
 
     private void Update()
     {
         if (empty)
-            otherObj = getOtherObjectLowDistance.ReturnOtherObject() != null
-                ? getOtherObjectLowDistance.ReturnOtherObject()
-                : getOtherObjectSelfController.ReturnOtherObject();
+        {
+            otherObj = getOtherObjectTrigger.ReturnOtherObject();
+        }
         else
+        {
             otherObj = null;
-        
-        
+        }
+
         if (grabble)
         {
             if (grabble.gameObject == null)
@@ -35,7 +37,7 @@ public class PicoGrabble : MonoBehaviour
 
             if (grabble.InLeftHand)
             {
-                grabble.Grab(PicoGrabbleManager.Instance.Controller0, 0.1f, 0.1f);
+                grabble.Grab(PicoGrabbleManager.Instance.Controller0, 0.3f, 1f);
 
                 if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A) ||
                     Input.GetKeyDown(KeyCode.Q))
@@ -47,7 +49,7 @@ public class PicoGrabble : MonoBehaviour
 
             if (grabble.InRightHand)
             {
-                grabble.Grab(PicoGrabbleManager.Instance.Controller1, 0.1f, 0.1f);
+                grabble.Grab(PicoGrabbleManager.Instance.Controller1, 0.3f, 1f);
 
                 if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A) ||
                     Input.GetKeyDown(KeyCode.E))
@@ -60,6 +62,7 @@ public class PicoGrabble : MonoBehaviour
 
         if (otherObj)
         {
+            
             if (this.gameObject.Equals(PicoGrabbleManager.Instance.Controller0))
             {
                 if (!otherObj.GetComponent<Grabble>().InRightHand)

@@ -7,13 +7,13 @@ using UnityEngine;
 public class PicoGrabbleManager : MonoBehaviour
 {
     public static PicoGrabbleManager Instance;
-    public GameObject _controller0, _controller1;
+    public GameObject controller0, controller1;
     [HideInInspector] public PicoGrabble leftHand;
     [HideInInspector] public PicoGrabble rightHand;
     
-    public GameObject Controller0 => _controller0;
+    public GameObject Controller0 => controller0;
 
-    public GameObject Controller1 => _controller1;
+    public GameObject Controller1 => controller1;
     
     public PicoGrabble LeftHand
     {
@@ -40,7 +40,7 @@ public class PicoGrabbleManager : MonoBehaviour
 
      void Start()
     {
-        leftHand = _controller0.GetComponent<PicoGrabble>();
-        rightHand = _controller1.GetComponent<PicoGrabble>();
+        leftHand = controller0.GetComponent<PicoGrabble>();
+        rightHand = controller1.GetComponent<PicoGrabble>();
     }
 }

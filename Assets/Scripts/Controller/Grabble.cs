@@ -7,7 +7,6 @@ using UnityEngine;
 public class Grabble : MonoBehaviour
 {
     [SerializeField] bool interactable = true;
-    
     [HideInInspector] Rigidbody rb;
 
     [SerializeField]bool grabbed = false;

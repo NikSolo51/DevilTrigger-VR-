@@ -14,7 +14,8 @@ public class Revolver : MonoBehaviour
     [SerializeField] private CylinderScript Cylinder;
     [SerializeField] private Animator gunAnimator;
     [SerializeField] private Transform barrelLocation;
-
+    [SerializeField] private AudioSource audio;
+    [SerializeField] private AudioClip shoot;
 
     [Header("Settings")] [Tooltip("Specify time to destory the casing object")] [SerializeField]
     private float destroyTimer = 2f;
@@ -39,6 +40,8 @@ public class Revolver : MonoBehaviour
 
         if (gunAnimator == null)
             gunAnimator = GetComponentInChildren<Animator>();
+        
+        Cylinder.OpenCylinder(false);
     }
 
     void Update()
@@ -50,22 +53,24 @@ public class Revolver : MonoBehaviour
 
         if (cylinderOpen)
         {
-           
+            
             if ((revolverGrabble.InLeftHand && Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.B)) ||
                 Input.GetKeyDown(KeyCode.R))
             {
-                Debug.Log("Close");
+                
                 gunAnimator.SetBool("OpenCylinder", false);
                 cylinderOpen = false;
+                Cylinder.OpenCylinder(false);
                 return;
             }
 
             if ((revolverGrabble.InRightHand && Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.B)) ||
                 Input.GetKeyDown(KeyCode.R))
             {
-                Debug.Log("Close");
+                
                 gunAnimator.SetBool("OpenCylinder", false);
                 cylinderOpen = false;
+                Cylinder.OpenCylinder(false);
                 return;
             }
         }
@@ -73,18 +78,20 @@ public class Revolver : MonoBehaviour
         if ((revolverGrabble.InLeftHand && Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.B)) ||
             Input.GetKeyDown(KeyCode.R))
         {
-            Debug.Log("Open");
+            
             gunAnimator.SetBool("OpenCylinder", true);
             cylinderOpen = true;
+            Cylinder.OpenCylinder(true);
             return;
         }
 
         if ((revolverGrabble.InRightHand && Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.B)) ||
             Input.GetKeyDown(KeyCode.R))
         {
-            Debug.Log("Open");
+            
             gunAnimator.SetBool("OpenCylinder", true);
             cylinderOpen = true;
+            Cylinder.OpenCylinder(true);
             return;
         }
         
@@ -146,5 +153,15 @@ public class Revolver : MonoBehaviour
     }
 
     void RotateCyl() =>  Cylinder.RotateCyl();
+
+    public void PlayShoot()
+    {
+        if (!bulletPrefab)
+            return;
+        if (!bullet)
+            return;
+        
+        audio.PlayOneShot(shoot) ;
+    } 
     
 }
