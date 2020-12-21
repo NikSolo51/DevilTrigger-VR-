@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Muzzle : MonoBehaviour
 {
-    private GetOtherObjectTrigger _otherObject;
+    private GetOtherObjectTrigger getOtherObjectTrigger;
     private Bullet bullet;
 
     public Bullet Bullet
@@ -16,8 +16,8 @@ public class Muzzle : MonoBehaviour
 
     private void Start()
     {
-        if (_otherObject == null)
-            _otherObject = gameObject.GetComponent<GetOtherObjectTrigger>();
+        if (getOtherObjectTrigger == null)
+            getOtherObjectTrigger = gameObject.GetComponent<GetOtherObjectTrigger>();
     }
 
     private void Update()
@@ -27,9 +27,9 @@ public class Muzzle : MonoBehaviour
 
     private void GetCurrentBulletInRevolverCylinder()
     {
-        if(_otherObject.ReturnOtherObject())
-            if (_otherObject.ReturnOtherObject().GetComponent<Bullet>())
-                bullet = _otherObject.ReturnOtherObject().GetComponent<Bullet>();        
+        if(getOtherObjectTrigger.OtherObj)
+            if (getOtherObjectTrigger.OtherObj.GetComponent<Bullet>())
+                bullet = getOtherObjectTrigger.OtherObj.GetComponent<Bullet>();        
     }
     
 }

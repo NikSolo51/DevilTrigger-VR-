@@ -23,7 +23,7 @@ public class PicoGrabble : MonoBehaviour
     {
         if (empty)
         {
-            otherObj = getOtherObjectTrigger.ReturnOtherObject();
+            otherObj = getOtherObjectTrigger.OtherObj;
         }
         else
         {

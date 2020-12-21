@@ -46,11 +46,11 @@ public class CylinderScript : MonoBehaviour
         for (int i = 0; i < chambersDictionary.Values.Count; i++)
         {
             picoSocketsInteractors[i] = chambersDictionary.Values.ElementAt(i);
-            bulletList[i] = picoSocketsInteractors[i].OtherObj;
+            bulletList[i] = picoSocketsInteractors[i].ObjectInPicoIntrerafctor;
         }
         
         
-        IEnumerable<PicoSocketInteractor> duplicates = picoSocketsInteractors.GroupBy(s => s.OtherObj).SelectMany(grp => grp.Skip(1));
+        IEnumerable<PicoSocketInteractor> duplicates = picoSocketsInteractors.GroupBy(s => s.ObjectInPicoIntrerafctor).SelectMany(grp => grp.Skip(1));
         dublicatesOtheObj = duplicates.ToList();
         
         for (int i = 0; i < dublicatesOtheObj.Count; i++)
@@ -97,9 +97,9 @@ public class CylinderScript : MonoBehaviour
         {
             for (int i = 0; i < picoSocketsInteractors.Count; i++)
             {
-                if (picoSocketsInteractors[i].OtherObj)
+                if (picoSocketsInteractors[i].ObjectInPicoIntrerafctor)
                 {
-                    picoSocketsInteractors[i].OtherObj.GetComponent<Grabble>().gameObject.layer = 0;
+                    picoSocketsInteractors[i].ObjectInPicoIntrerafctor.GetComponent<Grabble>().gameObject.layer = 0;
                 }
                     
             }
@@ -108,9 +108,9 @@ public class CylinderScript : MonoBehaviour
         {
             for (int i = 0; i < picoSocketsInteractors.Count; i++)
             {
-                if (picoSocketsInteractors[i].OtherObj)
+                if (picoSocketsInteractors[i].ObjectInPicoIntrerafctor)
                 {
-                    picoSocketsInteractors[i].OtherObj.GetComponent<Grabble>().gameObject.layer = 8;
+                    picoSocketsInteractors[i].ObjectInPicoIntrerafctor.GetComponent<Grabble>().gameObject.layer = 8;
                 }
             }
         }

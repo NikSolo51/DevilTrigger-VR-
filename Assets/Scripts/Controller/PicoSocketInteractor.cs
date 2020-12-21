@@ -12,7 +12,7 @@ public class PicoSocketInteractor : MonoBehaviour
     [SerializeField] Grabble grabble;
     private bool triggerEmpty;
     
-    public GameObject OtherObj
+    public GameObject ObjectInPicoIntrerafctor
     {
         get
         {
