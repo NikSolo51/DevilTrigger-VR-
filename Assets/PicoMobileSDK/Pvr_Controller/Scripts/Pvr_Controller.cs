@@ -12,6 +12,7 @@ using System;
 
 public class Pvr_Controller : MonoBehaviour
 {
+
     /************************************    Properties  *************************************/
     #region Properties
 
@@ -60,7 +61,7 @@ public class Pvr_Controller : MonoBehaviour
         Pvr_ControllerManager.SetControllerAbilityEvent += CheckControllerState;
         Pvr_ControllerManager.ChangeMainControllerCallBackEvent += MainControllerChanged;
         Pvr_ControllerManager.ChangeHandNessCallBackEvent += HandnessChanged;
-        
+
     }
     void Start()
     {
