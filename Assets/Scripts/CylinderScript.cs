@@ -4,63 +4,57 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class CylinderScript : MonoBehaviour
+public class CylinderScript : MonoBehaviour , IGrabble
 {
-    [SerializeField] private GameObject Chambers;
-    [SerializeField] private GameObject Cylinder;
-    [SerializeField] private bool rotatingCyl = false;
+    [SerializeField] private GameObject chambers;
+    [SerializeField] private GameObject cylinder;
+    private bool rotatingCyl = false;
     [SerializeField] private float endAngle = 60F;
+    private NearestPoint nearestPoint = new NearestPoint();
     
-    private Dictionary<int, PicoSocketInteractor> chambersDictionary = new Dictionary<int, PicoSocketInteractor>();
 
     private int chambersQueue;
-    [SerializeField] private List<GameObject> bulletList = new List<GameObject>();
-    private List<PicoSocketInteractor> picoSocketsInteractors = new List<PicoSocketInteractor>();
+    [SerializeField] private List<GameObject> chamberList = new List<GameObject>();
     public GameObject bulletForShot;
-    // Duplicates OtheObjects In PicoSocketInteractors
-    public List<PicoSocketInteractor> dublicatesOtheObj;
-   
     
-
     private void Start()
     {
-        if (Cylinder == null)
-            Cylinder = this.gameObject;
+        if (cylinder == null)
+            cylinder = this.gameObject;
 
-        for (int i = 0; i < Chambers.transform.childCount; i++)
+
+        for (int i = 0; i < chambers.transform.childCount; i++)
         {
-            bulletList.Add(new GameObject());
-            picoSocketsInteractors.Add(new PicoSocketInteractor());
-            Destroy(bulletList[i]);
-            chambersDictionary.Add(i, Chambers.transform.GetChild((Chambers.transform.childCount -1 ) - i).GetComponent<PicoSocketInteractor>());
+            if (chambers.transform.GetChild(i).GetComponent<Chamber>())
+                chamberList.Add(chambers.transform.GetChild(i).gameObject);
+                
         }
     }
-    
+
+    private void OnTriggerStay(Collider other)
+    {
+        Grabble bullet = other?.GetComponent<Grabble>();
+        if(bullet)
+        if (bullet.BeGrabbed)
+        {
+            GameObject nearestChamber = nearestPoint.GetNearestPoint(chamberList, other.gameObject);
+            bullet.transform.SetParent(nearestChamber.transform);
+            bullet.Grab(nearestChamber, 1, 1);
+        }
+        else
+            bullet = null;
+    }
+
     private void Update()
     {
+        
         if (rotatingCyl)
         {
             RotateCyl();
         }
         
-        for (int i = 0; i < chambersDictionary.Values.Count; i++)
-        {
-            picoSocketsInteractors[i] = chambersDictionary.Values.ElementAt(i);
-            bulletList[i] = picoSocketsInteractors[i].ObjectInPicoIntrerafctor;
-        }
-        
-        
-        IEnumerable<PicoSocketInteractor> duplicates = picoSocketsInteractors.GroupBy(s => s.ObjectInPicoIntrerafctor).SelectMany(grp => grp.Skip(1));
-        dublicatesOtheObj = duplicates.ToList();
-        
-        for (int i = 0; i < dublicatesOtheObj.Count; i++)
-        {
-           // dublicatesOtheObj[i].ResetState();    
-        }
-        
-
-        if (bulletList[chambersQueue] != null)
-            bulletForShot = bulletList[chambersQueue];
+        if (chamberList[chambersQueue] != null)
+            bulletForShot = chamberList[chambersQueue].transform.GetChild(0).gameObject;
         else
             bulletForShot = null;
 
@@ -68,51 +62,34 @@ public class CylinderScript : MonoBehaviour
 
     public void RotateCyl()
     {
-        if (endAngle == 360F && Cylinder.transform.localRotation.eulerAngles.y < 60F)
+        if (endAngle == 360F && cylinder.transform.localRotation.eulerAngles.y < 60F)
         {
             endAngle = 0F;
         }
 
-        if (Cylinder.transform.localRotation.eulerAngles.y < endAngle)
+        if (cylinder.transform.localRotation.eulerAngles.y < endAngle)
         {
             rotatingCyl = true;
             Quaternion target = Quaternion.Euler(0, endAngle, 0);
-            Cylinder.transform.localRotation = Quaternion.RotateTowards(Cylinder.transform.localRotation, target, Time.deltaTime * 100F);
+            cylinder.transform.localRotation = Quaternion.RotateTowards(cylinder.transform.localRotation, target, Time.deltaTime * 100F);
         }
         else
         {
-            if(chambersQueue  < Chambers.transform.childCount )
+            if(chambersQueue  < chambers.transform.childCount )
             chambersQueue++;
-            if (chambersQueue == Chambers.transform.childCount)
+            if (chambersQueue == chambers.transform.childCount)
                 chambersQueue = 0;
 
             rotatingCyl = false;
             endAngle += 60F;
         }
     }
-
-    public void OpenCylinder(bool open)
+    
+    public GameObject GetGrabble(SenderInfo sender)
     {
-        if (open)
-        {
-            for (int i = 0; i < picoSocketsInteractors.Count; i++)
-            {
-                if (picoSocketsInteractors[i].ObjectInPicoIntrerafctor)
-                {
-                    picoSocketsInteractors[i].ObjectInPicoIntrerafctor.GetComponent<Grabble>().gameObject.layer = 0;
-                }
-                    
-            }
-        }
-        else
-        {
-            for (int i = 0; i < picoSocketsInteractors.Count; i++)
-            {
-                if (picoSocketsInteractors[i].ObjectInPicoIntrerafctor)
-                {
-                    picoSocketsInteractors[i].ObjectInPicoIntrerafctor.GetComponent<Grabble>().gameObject.layer = 8;
-                }
-            }
-        }
+        
+        return nearestPoint.GetNearestPoint(chamberList, sender.senderRayHit.point);
     }
+
+    
 }

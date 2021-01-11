@@ -30,6 +30,7 @@ public class Revolver : MonoBehaviour
     private Bullet bullet;
     [SerializeField]private bool cylinderOpen = false;
     
+    
 
     void Start()
     {
@@ -41,7 +42,7 @@ public class Revolver : MonoBehaviour
         if (gunAnimator == null)
             gunAnimator = GetComponentInChildren<Animator>();
         
-        Cylinder.OpenCylinder(false);
+        ;
     }
 
     void Update()
@@ -60,7 +61,7 @@ public class Revolver : MonoBehaviour
                 
                 gunAnimator.SetBool("OpenCylinder", false);
                 cylinderOpen = false;
-                Cylinder.OpenCylinder(false);
+                
                 return;
             }
 
@@ -70,7 +71,7 @@ public class Revolver : MonoBehaviour
                 
                 gunAnimator.SetBool("OpenCylinder", false);
                 cylinderOpen = false;
-                Cylinder.OpenCylinder(false);
+                
                 return;
             }
         }
@@ -81,7 +82,7 @@ public class Revolver : MonoBehaviour
             
             gunAnimator.SetBool("OpenCylinder", true);
             cylinderOpen = true;
-            Cylinder.OpenCylinder(true);
+            
             return;
         }
 
@@ -91,7 +92,7 @@ public class Revolver : MonoBehaviour
             
             gunAnimator.SetBool("OpenCylinder", true);
             cylinderOpen = true;
-            Cylinder.OpenCylinder(true);
+            
             return;
         }
         

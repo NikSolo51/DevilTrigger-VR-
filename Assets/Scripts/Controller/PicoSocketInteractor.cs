@@ -43,6 +43,7 @@ public class PicoSocketInteractor : MonoBehaviour
         
         if (!emptySocket)
         {
+            if(grabble)
             if (grabble.InLeftHand || grabble.InRightHand)
             {
                 Debug.Log("IsResetState" + this.gameObject);
@@ -54,15 +55,12 @@ public class PicoSocketInteractor : MonoBehaviour
         if (otherObj)
             if (emptySocket)
             {
-                Debug.Log("SocketNotEmpty " + this.gameObject);
                 if(otherObj.GetComponent<Grabble>().InLeftHand)
                 {
-                    Debug.Log("InLeftHand");
                     if (otherObj.GetComponent<Grabble>().InLeftHand)
                         if (Input.GetKeyDown(KeyCode.Q) ||
                              Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A))
                         {
-                            Debug.Log("IGETOBJECT");
                             grabble = otherObj.GetComponent<Grabble>();
                             emptySocket = false;
                             return;
@@ -85,7 +83,7 @@ public class PicoSocketInteractor : MonoBehaviour
             if (!emptySocket)
             {
                 if(!grabble.InLeftHand && !grabble.InRightHand)
-                grabble.Grab(this.gameObject, 1f, 1f);
+                grabble.Grab(this.gameObject,1,1);
             }
         }
         

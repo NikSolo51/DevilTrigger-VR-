@@ -7,29 +7,63 @@ using UnityEngine;
 public class PicoGrabble : MonoBehaviour
 {
     [SerializeField] private bool empty = true;
-    [SerializeField] GameObject otherObj;
+    [SerializeField] private GameObject otherObj;
+    [SerializeField] private LayerMask _layerMask;
     private Grabble grabble;
-    [SerializeField]private GetOtherObjectTrigger getOtherObjectTrigger;
+    private Ray ray;
+    private RaycastHit hit;
+    private SenderInfo sender = new SenderInfo();
 
     private void Start()
     {
-        if(!getOtherObjectTrigger)
-        getOtherObjectTrigger = GetComponent<GetOtherObjectTrigger>();
+        sender.senderObject = this.gameObject;
+        sender.senderRay = ray;
     }
 
     public Grabble Grabble => grabble;
 
     private void Update()
     {
-        if (empty)
+        ray = new Ray(transform.position, transform.forward);
+        Debug.DrawRay(transform.position, transform.forward, Color.white);
+
+        if (Physics.Raycast(ray, out hit,10))
         {
-            otherObj = getOtherObjectTrigger.OtherObj;
-        }
-        else
-        {
-            otherObj = null;
+            if(hit.collider.GetComponent<IGrabble>()?.GetGrabble(sender))
+            Debug.Log(hit.collider.GetComponent<IGrabble>().GetGrabble(sender));
+            if (hit.transform.GetComponent<IGrabble>()?.GetGrabble(sender) != null)
+            {
+                sender.senderRayHit = hit;
+                if (!hit.transform.GetComponent<IGrabble>().GetGrabble(sender).GetComponent<Grabble>().Grabbed)
+                {
+                    otherObj = hit.transform.GetComponent<IGrabble>().GetGrabble(sender);
+                    SetOutLineWidth(3f);
+                }
+            }
+            else
+            {
+                SetOutLineWidth(0.001f);
+                otherObj = null;
+            }
         }
 
+        DropObject();
+        TakeObject();
+    }
+
+    private void FixedUpdate()
+    {
+        if (grabble)
+        {
+            if (grabble.InLeftHand)
+                grabble.Grab(PicoGrabbleManager.Instance.Controller0, 1, 1);
+            else
+                grabble.Grab(PicoGrabbleManager.Instance.Controller1, 1, 1);
+        }
+    }
+
+    public void DropObject()
+    {
         if (grabble)
         {
             if (grabble.gameObject == null)
@@ -37,9 +71,7 @@ public class PicoGrabble : MonoBehaviour
 
             if (grabble.InLeftHand)
             {
-                grabble.Grab(PicoGrabbleManager.Instance.Controller0, 0.3f, 1f);
-
-                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A) ||
+                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.Left) ||
                     Input.GetKeyDown(KeyCode.Q))
                 {
                     ResetControllerState();
@@ -49,9 +81,7 @@ public class PicoGrabble : MonoBehaviour
 
             if (grabble.InRightHand)
             {
-                grabble.Grab(PicoGrabbleManager.Instance.Controller1, 0.3f, 1f);
-
-                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A) ||
+                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.Right) ||
                     Input.GetKeyDown(KeyCode.E))
                 {
                     ResetControllerState();
@@ -59,14 +89,16 @@ public class PicoGrabble : MonoBehaviour
                 }
             }
         }
+    }
 
+    public void TakeObject()
+    {
         if (otherObj)
         {
-            
-            if (this.gameObject.Equals(PicoGrabbleManager.Instance.Controller0))
+            if (this.gameObject == PicoGrabbleManager.Instance.Controller0)
             {
                 if (!otherObj.GetComponent<Grabble>().InRightHand)
-                    if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.A) ||
+                    if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.Left) ||
                         Input.GetKeyDown(KeyCode.Q))
                     {
                         grabble = otherObj.GetComponent<Grabble>();
@@ -76,10 +108,10 @@ public class PicoGrabble : MonoBehaviour
                     }
             }
 
-            if (this.gameObject.Equals(PicoGrabbleManager.Instance.Controller1))
+            if (this.gameObject == PicoGrabbleManager.Instance.Controller1)
             {
                 if (!otherObj.GetComponent<Grabble>().InLeftHand)
-                    if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.A) ||
+                    if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.Right) ||
                         Input.GetKeyDown(KeyCode.E))
                     {
                         grabble = otherObj.GetComponent<Grabble>();
@@ -90,6 +122,7 @@ public class PicoGrabble : MonoBehaviour
             }
         }
     }
+
 
     void ResetControllerState()
     {
@@ -104,5 +137,12 @@ public class PicoGrabble : MonoBehaviour
     {
         foreach (Renderer r in controller.GetComponentsInChildren<Renderer>())
             r.enabled = active;
+    }
+
+    public void SetOutLineWidth(float width)
+    {
+        if (otherObj)
+            if (otherObj.GetComponentInChildren<Outline>())
+                otherObj.GetComponentInChildren<Outline>().OutlineWidth = width;
     }
 }

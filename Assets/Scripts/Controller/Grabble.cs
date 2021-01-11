@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Grabble : MonoBehaviour
+public class Grabble : MonoBehaviour , IGrabble
 {
     [SerializeField] bool interactable = true;
     [HideInInspector] Rigidbody rb;
@@ -14,6 +14,15 @@ public class Grabble : MonoBehaviour
     [SerializeField]bool inRightHand = false;
     [SerializeField]Vector3 axis;
     [SerializeField]float offsetRotation;
+    
+    private bool beGrabbed;
+
+    public bool BeGrabbed
+    {
+        get => beGrabbed;
+        set => beGrabbed = value;
+    }
+
     public bool Grabbed
     {
         get => grabbed;
@@ -53,18 +62,31 @@ public class Grabble : MonoBehaviour
     
     public void ResetState()
     {
-        rb.isKinematic = false;
+        WasCaptured();
         grabbed = false;
         inLeftHand = false;
         inRightHand = false;
     }
     
-    public void Grab(GameObject grabber, float percentPosition, float percentRotation)
+    public void Grab(GameObject grabber, float speed, float speedRotation)
     {
-        rb.isKinematic = true; 
         grabbed = true;
-        transform.position = Vector3.Lerp(transform.position, grabber.transform.position, percentPosition);
-        transform.rotation = Quaternion.Slerp(transform.rotation, grabber.transform.rotation, percentRotation);
+        rb.AddForce(((grabber.transform.position - transform.position) * 500f) * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, grabber.transform.rotation, speedRotation);
         transform.Rotate(axis,offsetRotation);
     }
+
+    private IEnumerator WasCaptured()
+    {
+        beGrabbed = true;
+        yield return  new WaitForSeconds(0.4f);
+        beGrabbed = false;
+    }
+
+
+    public GameObject GetGrabble(SenderInfo sender)
+    {
+        return this.gameObject;
+    }
+    
 }
