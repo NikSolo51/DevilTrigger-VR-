@@ -13,7 +13,7 @@ public enum BylletTypeEnum
 
 public class Bullet : MonoBehaviour
 {
-    public BulletData BulletData;
+    public BulletDataScriptbleObject BulletData;
     public BylletTypeEnum BylletTypeEnum;
     public GameObject bulletPrefab;
     public IBullet bulletType;

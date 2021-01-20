@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class Revolver : MonoBehaviour
 {
+    
     [Header("Prefab Refrences")] [HideInInspector]
     public GameObject bulletPrefab;
 
     [HideInInspector] public GameObject casingPrefab;
 
-    [Header("Location Refrences")] 
-    [SerializeField] private CylinderScript Cylinder;
+    [Header("Location Refrences")]
     [SerializeField] private Animator gunAnimator;
     [SerializeField] private Transform barrelLocation;
     [SerializeField] private AudioSource audio;
@@ -42,7 +42,6 @@ public class Revolver : MonoBehaviour
         if (gunAnimator == null)
             gunAnimator = GetComponentInChildren<Animator>();
         
-        ;
     }
 
     void Update()
@@ -152,9 +151,7 @@ public class Revolver : MonoBehaviour
         _bullet.GetComponent<Rigidbody>().AddForce(barrelLocation.forward * shotPower);
         Destroy(_bullet, destroyTimer);
     }
-
-    void RotateCyl() =>  Cylinder.RotateCyl();
-
+    
     public void PlayShoot()
     {
         if (!bulletPrefab)
@@ -163,6 +160,6 @@ public class Revolver : MonoBehaviour
             return;
         
         audio.PlayOneShot(shoot) ;
-    } 
-    
+    }
+
 }

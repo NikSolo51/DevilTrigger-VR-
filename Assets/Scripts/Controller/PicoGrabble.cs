@@ -6,31 +6,51 @@ using UnityEngine;
 
 public class PicoGrabble : MonoBehaviour
 {
-    [SerializeField] private bool empty = true;
     [SerializeField] private GameObject otherObj;
-    [SerializeField] private LayerMask _layerMask;
     private Grabble grabble;
     private Ray ray;
     private RaycastHit hit;
     private SenderInfo sender = new SenderInfo();
+    private bool keepInLeftController;
+    private bool keepInRightController;
 
     private void Start()
     {
         sender.senderObject = this.gameObject;
         sender.senderRay = ray;
     }
-
-    public Grabble Grabble => grabble;
-
+    
     private void Update()
+    {
+        GetAnObjectUsingRaycast();
+
+        if (grabble)
+            if (TryingToThrowAnObjectWithTheLeftController() || TryingToThrowAnObjectWithTheRightController())
+                DropObject();
+        if (TryingToTakeTheLeftController() || TryingToTakeTheRightController())
+            TakeObject();
+    }
+
+    private void FixedUpdate()
+    {
+        if (grabble)
+        {
+            if (grabble.InLeftHand)
+                grabble.Grab(PicoGrabbleManager.Instance.Controller0, 1, 1);
+            else
+                grabble.Grab(PicoGrabbleManager.Instance.Controller1, 1, 1);
+        }
+    }
+
+    private void GetAnObjectUsingRaycast()
     {
         ray = new Ray(transform.position, transform.forward);
         Debug.DrawRay(transform.position, transform.forward, Color.white);
 
-        if (Physics.Raycast(ray, out hit,10))
+        if (Physics.Raycast(ray, out hit, 10))
         {
-            if(hit.collider.GetComponent<IGrabble>()?.GetGrabble(sender))
-            Debug.Log(hit.collider.GetComponent<IGrabble>().GetGrabble(sender));
+            if (hit.collider.GetComponent<IGrabble>()?.GetGrabble(sender))
+                Debug.Log(hit.collider.GetComponent<IGrabble>().GetGrabble(sender));
             if (hit.transform.GetComponent<IGrabble>()?.GetGrabble(sender) != null)
             {
                 sender.senderRayHit = hit;
@@ -46,52 +66,56 @@ public class PicoGrabble : MonoBehaviour
                 otherObj = null;
             }
         }
-
-        DropObject();
-        TakeObject();
     }
 
-    private void FixedUpdate()
+    private void DropObject()
     {
-        if (grabble)
-        {
-            if (grabble.InLeftHand)
-                grabble.Grab(PicoGrabbleManager.Instance.Controller0, 1, 1);
-            else
-                grabble.Grab(PicoGrabbleManager.Instance.Controller1, 1, 1);
-        }
+        if (grabble.gameObject == null)
+            ResetControllerState();
+
+        ResetControllerState();
     }
 
-    public void DropObject()
+    private bool TryingToThrowAnObjectWithTheLeftController()
     {
-        if (grabble)
+        if (grabble.InLeftHand)
         {
-            if (grabble.gameObject == null)
-                ResetControllerState();
-
-            if (grabble.InLeftHand)
+            if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.Left) ||
+                Input.GetKeyDown(KeyCode.Q))
             {
-                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.Left) ||
-                    Input.GetKeyDown(KeyCode.Q))
-                {
-                    ResetControllerState();
-                    return;
-                }
-            }
-
-            if (grabble.InRightHand)
-            {
-                if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.Right) ||
-                    Input.GetKeyDown(KeyCode.E))
-                {
-                    ResetControllerState();
-                    return;
-                }
+                return true;
             }
         }
+
+        return false;
     }
 
-    public void TakeObject()
+    private bool TryingToThrowAnObjectWithTheRightController()
+    {
+        if (grabble.InRightHand)
+        {
+            if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.Right) ||
+                Input.GetKeyDown(KeyCode.E))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void TakeObject()
+    {
+        grabble = otherObj.GetComponent<Grabble>();
+        ActiveMeshRender(false, this.gameObject);
+
+        if (keepInLeftController)
+            grabble.InLeftHand = true;
+        else
+            grabble.InRightHand = true;
+    }
+
+    private bool TryingToTakeTheLeftController()
     {
         if (otherObj)
         {
@@ -101,36 +125,43 @@ public class PicoGrabble : MonoBehaviour
                     if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(0, Pvr_KeyCode.Left) ||
                         Input.GetKeyDown(KeyCode.Q))
                     {
-                        grabble = otherObj.GetComponent<Grabble>();
-                        empty = false;
-                        grabble.InLeftHand = true;
-                        ActiveMeshRender(false, this.gameObject);
+                        keepInLeftController = true;
+                        return true;
                     }
             }
+        }
 
+        return false;
+    }
+
+    private bool TryingToTakeTheRightController()
+    {
+        if (otherObj)
+        {
             if (this.gameObject == PicoGrabbleManager.Instance.Controller1)
             {
                 if (!otherObj.GetComponent<Grabble>().InLeftHand)
                     if (Pvr_UnitySDKAPI.Controller.UPvr_GetKeyDown(1, Pvr_KeyCode.Right) ||
                         Input.GetKeyDown(KeyCode.E))
                     {
-                        grabble = otherObj.GetComponent<Grabble>();
-                        empty = false;
-                        grabble.InRightHand = true;
-                        ActiveMeshRender(false, this.gameObject);
+                        keepInRightController = true;
+                        return true;
                     }
             }
         }
+
+        return false;
     }
 
 
-    void ResetControllerState()
+    private void ResetControllerState()
     {
         ActiveMeshRender(true, this.gameObject);
         grabble.ResetState();
-        empty = true;
         otherObj = null;
         grabble = null;
+        keepInLeftController = false;
+        keepInRightController = false;
     }
 
     private void ActiveMeshRender(bool active, GameObject controller)
