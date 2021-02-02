@@ -8,12 +8,13 @@ public class Grabble : MonoBehaviour , IGrabble
 {
     [SerializeField] bool interactable = true;
     [HideInInspector] Rigidbody rb;
-
+    private const float G = 667.4f;
     [SerializeField]bool grabbed = false;
     [SerializeField]bool inLeftHand = false;
     [SerializeField]bool inRightHand = false;
     [SerializeField]Vector3 axis;
     [SerializeField]float offsetRotation;
+    bool isLerping;
     
     private bool beGrabbed;
 
@@ -62,7 +63,8 @@ public class Grabble : MonoBehaviour , IGrabble
     
     public void ResetState()
     {
-        WasCaptured();
+        StartCoroutine(WasCaptured());
+        rb.useGravity = true;
         grabbed = false;
         inLeftHand = false;
         inRightHand = false;
@@ -70,12 +72,18 @@ public class Grabble : MonoBehaviour , IGrabble
     
     public void Grab(GameObject grabber, float speed, float speedRotation)
     {
+        if (Vector3.Distance(grabber.transform.position, transform.position) <= .1f)
+        {
+            transform.position = grabber.transform.position;
+        }
         grabbed = true;
-        rb.AddForce(((grabber.transform.position - transform.position) * 500f) * Time.deltaTime);
+        rb.useGravity = false;
+        float force = 6.67f *  (2 * rb.mass *  (Vector3.Distance(grabber.transform.position,this.transform.position))) / Mathf.Pow(0.2f, 2);
+        rb.AddForce(force  * Vector3.Normalize(grabber.transform.position - transform.position));
         transform.rotation = Quaternion.Slerp(transform.rotation, grabber.transform.rotation, speedRotation);
         transform.Rotate(axis,offsetRotation);
     }
-
+    
     private IEnumerator WasCaptured()
     {
         beGrabbed = true;

@@ -13,10 +13,9 @@ public enum BylletTypeEnum
 
 public class Bullet : MonoBehaviour
 {
-    public BulletDataScriptbleObject BulletData;
+    public PrefabBulletData BulletData;
     public BylletTypeEnum BylletTypeEnum;
-    public GameObject bulletPrefab;
-    public IBullet bulletType;
+    private GameObject bulletPrefab;
 
     public GameObject BulletPrefab
     {
@@ -34,19 +33,14 @@ public class Bullet : MonoBehaviour
         if (typeBullet == BylletTypeEnum.defaultbullet)
         {
             bulletPrefab = BulletData.bulletList.Where(x => x.GetComponent<DefaultBullet>()).ToList()[0];
-            bulletType = new BulletDefault();
         }
 
 
         if (BylletTypeEnum == BylletTypeEnum.firebullet)
         {
             bulletPrefab = BulletData.bulletList.Where(x => x.GetComponent<FireBullet>()).ToList()[0];
-            bulletType = new FireBullet();
         }
     }
 
-    public IBullet ReturnBulletType()
-    {
-        return bulletType;
-    }
+   
 }

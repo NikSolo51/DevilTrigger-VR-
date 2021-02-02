@@ -10,14 +10,14 @@ public class PicoGrabble : MonoBehaviour
     private Grabble grabble;
     private Ray ray;
     private RaycastHit hit;
-    private SenderInfo sender = new SenderInfo();
+    private SenderInfo SenderInfo = new SenderInfo();
     private bool keepInLeftController;
     private bool keepInRightController;
 
     private void Start()
     {
-        sender.senderObject = this.gameObject;
-        sender.senderRay = ray;
+        SenderInfo.senderObject = this.gameObject;
+        SenderInfo.senderRay = ray;
     }
     
     private void Update()
@@ -49,30 +49,28 @@ public class PicoGrabble : MonoBehaviour
 
         if (Physics.Raycast(ray, out hit, 10))
         {
-            if (hit.collider.GetComponent<IGrabble>()?.GetGrabble(sender))
-                Debug.Log(hit.collider.GetComponent<IGrabble>().GetGrabble(sender));
-            if (hit.transform.GetComponent<IGrabble>()?.GetGrabble(sender) != null)
+            //if (hit.collider.GetComponent<IGrabble>()?.GetGrabble(SenderInfo))
+                //otherObj = hit.collider.GetComponent<IGrabble>().GetGrabble(SenderInfo);
+            if (hit.transform.GetComponent<IGrabble>()?.GetGrabble(SenderInfo) != null)
             {
-                sender.senderRayHit = hit;
-                if (!hit.transform.GetComponent<IGrabble>().GetGrabble(sender).GetComponent<Grabble>().Grabbed)
+                SenderInfo.senderRayHit = hit;
+                if (!hit.transform.GetComponent<IGrabble>().GetGrabble(SenderInfo).GetComponent<Grabble>().Grabbed)
                 {
-                    otherObj = hit.transform.GetComponent<IGrabble>().GetGrabble(sender);
+                    otherObj = hit.transform.GetComponent<IGrabble>().GetGrabble(SenderInfo);
                     SetOutLineWidth(3f);
+                    return;
                 }
-            }
-            else
-            {
-                SetOutLineWidth(0.001f);
-                otherObj = null;
+                otherObj = hit.collider?.GetComponent<IGrabble>()?.GetGrabble(SenderInfo);
+                SetOutLineWidth(3f);
+                return;
             }
         }
+        SetOutLineWidth(0.001f);
+        otherObj = null;
     }
 
     private void DropObject()
     {
-        if (grabble.gameObject == null)
-            ResetControllerState();
-
         ResetControllerState();
     }
 
@@ -107,8 +105,10 @@ public class PicoGrabble : MonoBehaviour
     private void TakeObject()
     {
         grabble = otherObj.GetComponent<Grabble>();
+        otherObj.transform.SetParent(null);
+        //grabble.Rb.isKinematic = true;
         ActiveMeshRender(false, this.gameObject);
-
+        
         if (keepInLeftController)
             grabble.InLeftHand = true;
         else
@@ -157,6 +157,7 @@ public class PicoGrabble : MonoBehaviour
     private void ResetControllerState()
     {
         ActiveMeshRender(true, this.gameObject);
+        grabble.Rb.isKinematic = false;
         grabble.ResetState();
         otherObj = null;
         grabble = null;

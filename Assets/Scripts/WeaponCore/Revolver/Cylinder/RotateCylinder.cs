@@ -5,19 +5,19 @@ using UnityEngine;
 
 public class RotateCylinder : MonoBehaviour
 {
-    public RevolverEventSender revolverEventSender;
+    public RevolverEventSender RevolverEventSender;
     [SerializeField] private GameObject cylinder;
     private bool rotatingCyl = false;
     [SerializeField] private float endAngle = 60F;
-
+    
     public void Awake()
     {
-        revolverEventSender.OnRotateCylinder += RotateCyl;
+        RevolverEventSender.OnRotateCylinder += RotateCyl;
     }
 
     private void OnDestroy()
     {
-        revolverEventSender.OnRotateCylinder -= RotateCyl;
+        RevolverEventSender.OnRotateCylinder -= RotateCyl;
     }
 
     private void Start()
@@ -52,5 +52,6 @@ public class RotateCylinder : MonoBehaviour
             rotatingCyl = false;
             endAngle += 60F;
         }
+        
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 
     [CreateAssetMenu(fileName = "BulletData", menuName = "ScriptableObjects/BulletData", order = 1)]
-    public class BulletDataScriptbleObject : ScriptableObject
+    public class PrefabBulletData : ScriptableObject
     {
         public List<GameObject> bulletList;
     }
