@@ -16,6 +16,7 @@ public class Target : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("Yeaah");
         if (other.GetComponent<Bullet>() != null)
         {
             if (Source != null && hitSound != null)
