@@ -78,13 +78,14 @@ public class Grabble : MonoBehaviour , IGrabble
         {
             transform.position = grabber.transform.position;
         }
-        grabbed = true;
+         grabbed = true;
         rb.useGravity = false;
         float force = 6.67f *  (2 * rb.mass *  (Vector3.Distance(grabber.transform.position,this.transform.position))) / Mathf.Pow(0.2f, 2);
         rb.AddForce(force  * Vector3.Normalize(grabber.transform.position - transform.position));
         transform.rotation = Quaternion.Slerp(transform.rotation, grabber.transform.rotation, speedRotation);
         transform.Rotate(axis,offsetRotation);
         */
+        grabbed = true;
         rb.velocity = (grabber.transform.position - transform.position) / Time.fixedDeltaTime;
         rb.maxAngularVelocity = 20;
         Quaternion deltaRot = grabber.transform.rotation * Quaternion.Inverse(transform.rotation);
