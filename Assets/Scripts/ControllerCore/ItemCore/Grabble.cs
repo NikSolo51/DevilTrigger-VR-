@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -72,6 +73,7 @@ public class Grabble : MonoBehaviour , IGrabble
     
     public void Grab(GameObject grabber, float speed, float speedRotation)
     {
+        /*
         if (Vector3.Distance(grabber.transform.position, transform.position) <= .1f)
         {
             transform.position = grabber.transform.position;
@@ -82,6 +84,15 @@ public class Grabble : MonoBehaviour , IGrabble
         rb.AddForce(force  * Vector3.Normalize(grabber.transform.position - transform.position));
         transform.rotation = Quaternion.Slerp(transform.rotation, grabber.transform.rotation, speedRotation);
         transform.Rotate(axis,offsetRotation);
+        */
+        rb.velocity = (grabber.transform.position - transform.position) / Time.fixedDeltaTime;
+        rb.maxAngularVelocity = 20;
+        Quaternion deltaRot = grabber.transform.rotation * Quaternion.Inverse(transform.rotation);
+        Vector3 eulerRot = new Vector3(Mathf.DeltaAngle(0,deltaRot.eulerAngles.x)
+            ,Mathf.DeltaAngle(0,deltaRot.eulerAngles.y),Mathf.DeltaAngle(0,deltaRot.eulerAngles.z));
+        eulerRot *= 0.95f;
+        eulerRot *= Mathf.Deg2Rad;
+        rb.angularVelocity = eulerRot / Time.fixedDeltaTime;
     }
     
     private IEnumerator WasCaptured()
